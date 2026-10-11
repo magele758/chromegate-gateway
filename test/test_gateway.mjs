@@ -9,7 +9,7 @@ import { createGatewayMcpHandler } from "../native/mcp.mjs";
 import { mcpSnippet } from "../native/cli.mjs";
 
 const socketPath = defaultSocketPath({ env: {}, home: "/Users/example", platform: "darwin" });
-assert.equal(socketPath, "/Users/example/.chromegate/bridge.sock");
+assert.equal(socketPath, "/Users/example/.chromegate-gw/bridge.sock");
 
 const framed = encodeMessage({ op: "ping" });
 const parsed = tryReadMessage(framed);
@@ -80,9 +80,9 @@ assert.deepEqual(listed.result.tools.map((tool) => tool.name), ["list_tabs", "cl
 const forwarded = await mcp.handle({ jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "exec_command", arguments: { command: "id" } } });
 assert.equal(forwarded.result.isError, true);
 
-const snippet = mcpSnippet({ hostPath: "/opt/chromegate/native/host.mjs", tokenFile: "/tmp/cursor.token", nodePath: "/usr/bin/node" });
-assert.deepEqual(snippet.cursor.mcpServers.chromegate.args, ["/opt/chromegate/native/host.mjs", "--mcp", "--token-file", "/tmp/cursor.token"]);
+const snippet = mcpSnippet({ hostPath: "/opt/chromegate-gateway/native/host.mjs", tokenFile: "/tmp/cursor.token", nodePath: "/usr/bin/node" });
+assert.deepEqual(snippet.cursor.mcpServers["chromegate-gateway"].args, ["/opt/chromegate-gateway/native/host.mjs", "--mcp", "--token-file", "/tmp/cursor.token"]);
 assert.match(snippet.claude, /--mcp/);
-assert.match(snippet.codex, /mcp_servers\.chromegate/);
+assert.match(snippet.codex, /mcp_servers\.chromegate-gateway/);
 
 console.log("gateway ok");

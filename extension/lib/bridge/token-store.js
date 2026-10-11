@@ -2,7 +2,7 @@
 
 import { createTokenRecord, normalizeTokenList, publicTokenInfo } from "./auth.js";
 
-export const TOKENS_KEY = "agentTokens";
+export const TOKENS_KEY = "cgw.agentTokens";
 
 function area(storage) {
   return storage || globalThis.chrome?.storage?.local;

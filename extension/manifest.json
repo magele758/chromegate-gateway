@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ChromeGate",
+  "name": "ChromeGate Gateway",
   "version": "0.1.0",
   "minimum_chrome_version": "120",
   "description": "Per-agent token gate so local MCP clients can drive the signed-in Chrome with an audit log.",
@@ -10,7 +10,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "ChromeGate",
+    "default_title": "ChromeGate Gateway",
     "default_popup": "popup/index.html",
     "default_icon": {
       "16": "icons/icon16.png",

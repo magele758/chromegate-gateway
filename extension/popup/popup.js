@@ -92,7 +92,7 @@ $("tok-create").addEventListener("click", async () => {
     box.textContent = created?.error || "创建失败";
     return;
   }
-  const file = `~/.chromegate/agents/${tokenFileName($("tok-name").value)}.token`;
+  const file = `~/.chromegate-gw/agents/${tokenFileName($("tok-name").value)}.token`;
   box.hidden = false;
   box.textContent = `明文只显示一次。保存到 ${file}（权限 0600）：\n${created.token}`;
   await refresh();

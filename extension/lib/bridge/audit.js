@@ -1,5 +1,5 @@
 /**
- * 外部 Agent 调用的持久审计：IndexedDB（chromegate-data / agentAuditLog），滚动保留 AUDIT_CAP 条。
+ * 外部 Agent 调用的持久审计：IndexedDB（chromegate-gw-data / agentAuditLog），滚动保留 AUDIT_CAP 条。
  * 只记参数摘要：正文/代码/输入值只留长度，密钥类整项隐藏，URL 去掉 query 与 hash。
  */
 

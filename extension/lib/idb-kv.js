@@ -3,7 +3,7 @@
  * Missing IndexedDB: get → undefined, set → false, delete → no-op. Never throws.
  */
 
-export const DATA_DB = "chromegate-data";
+export const DATA_DB = "chromegate-gw-data";
 export const DATA_STORE = "kv";
 export const DATA_VERSION = 1;
 

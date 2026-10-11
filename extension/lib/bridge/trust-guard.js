@@ -48,7 +48,7 @@ export async function enforceTokenGuards(toolName, args = {}, { record, settings
     sessionId: sessionId || "",
   });
   throw new BridgeError(ERROR_CODES.CONFIRMATION_REQUIRED, `不可逆操作需用户批准：${item.reason}`, {
-    hint: "已放入待确认队列。请在 ChromeGate 弹窗里批准，然后用完全相同的参数重试（每次批准只放行一次）。",
+    hint: "已放入待确认队列。请在 ChromeGate Gateway 弹窗里批准，然后用完全相同的参数重试（每次批准只放行一次）。",
     details: { pendingId: entry.id, item: { id: item.id, label: item.label } },
   });
 }

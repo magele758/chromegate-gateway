@@ -21,6 +21,8 @@ export function normalizeSettings(raw) {
   };
 }
 
+export const SETTINGS_KEY = "cgw.settings";
+
 function areaOf(storage) {
   return storage || globalThis.chrome?.storage?.local;
 }
@@ -28,13 +30,13 @@ function areaOf(storage) {
 export async function loadSettings(storage) {
   const area = areaOf(storage);
   if (!area?.get) return defaultSettings();
-  const got = await area.get("settings");
-  return normalizeSettings(got?.settings);
+  const got = await area.get(SETTINGS_KEY);
+  return normalizeSettings(got?.[SETTINGS_KEY]);
 }
 
 export async function saveSettings(next, storage) {
   const area = areaOf(storage);
   const settings = normalizeSettings({ ...(await loadSettings(storage)), ...(next || {}) });
-  await area.set({ settings });
+  await area.set({ [SETTINGS_KEY]: settings });
   return settings;
 }

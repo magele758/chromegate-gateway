@@ -36,7 +36,7 @@ export function createGatewayMcpHandler({ token, socketPath, agentName = "mcp", 
   let connecting = null;
 
   function onEvent(event) {
-    notify({ jsonrpc: "2.0", method: "notifications/message", params: { level: "info", logger: "chromegate", data: event } });
+    notify({ jsonrpc: "2.0", method: "notifications/message", params: { level: "info", logger: "chromegate-gateway", data: event } });
   }
 
   async function ensure() {
@@ -63,7 +63,7 @@ export function createGatewayMcpHandler({ token, socketPath, agentName = "mcp", 
         result: {
           protocolVersion: params?.protocolVersion || "2024-11-05",
           capabilities: { tools: {} },
-          serverInfo: { name: "chromegate", version: "0.1.0" },
+          serverInfo: { name: "chromegate-gateway", version: "0.1.0" },
         },
       };
     }

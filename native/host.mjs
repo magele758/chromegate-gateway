@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ChromeGate native host。只做两件事：Native Messaging 网关 broker，以及 ~/.chromegate inbox/outbox。
+ * ChromeGate Gateway native host。只做两件事：Native Messaging 网关 broker，以及 ~/.chromegate-gw inbox/outbox。
  * --mcp 时作为 MCP stdio 客户端连到同一个网关。不提供本机命令或任意文件访问。
  */
 
@@ -13,7 +13,7 @@ import { encodeMessage, tryReadMessage } from "./framing.mjs";
 import { chromegateHome, processInboxOnce } from "./inbox.mjs";
 import { createGatewayMcpHandler } from "./mcp.mjs";
 
-export const HOST_NAME = "com.chromegate.host";
+export const HOST_NAME = "com.chromegate.gateway";
 export const HOST_VERSION = "0.1.0";
 
 const REFUSED = new Set(["exec", "fs", "shell", "clipboard_write"]);
@@ -26,8 +26,8 @@ export function resolveMcpToken({ argv = process.argv, env = process.env, home =
     const file = raw.startsWith("~") ? path.join(home, raw.slice(1)) : raw;
     return { token: fs.readFileSync(file, "utf8").trim(), source: file };
   }
-  const token = String(env.CHROMEGATE_TOKEN || "").trim();
-  return token ? { token, source: "CHROMEGATE_TOKEN" } : { token: "", source: "" };
+  const token = String(env.CHROMEGATE_GW_TOKEN || "").trim();
+  return token ? { token, source: "CHROMEGATE_GW_TOKEN" } : { token: "", source: "" };
 }
 
 export function createHostMessageHandler({
@@ -74,7 +74,7 @@ export function createHostMessageHandler({
     async onMessage(msg) {
       const op = String(msg?.op || "");
       if (REFUSED.has(op)) {
-        write({ ok: false, error: "ChromeGate host 不提供本机命令或任意文件访问。" });
+        write({ ok: false, error: "ChromeGate Gateway host 不提供本机命令或任意文件访问。" });
         return;
       }
       if (msg?.type === "broker.start") {
@@ -112,7 +112,7 @@ export function createHostMessageHandler({
   };
 }
 
-export function attachStdio(stdin = process.stdin, stdout = process.stdout, { log = (message) => process.stderr.write(`[chromegate-host] ${message}\n`) } = {}) {
+export function attachStdio(stdin = process.stdin, stdout = process.stdout, { log = (message) => process.stderr.write(`[chromegate-gw-host] ${message}\n`) } = {}) {
   const write = (obj) => stdout.write(encodeMessage(obj));
   const host = createHostMessageHandler({ write, log });
   let buf = Buffer.alloc(0);
@@ -163,18 +163,18 @@ function attachMcp(handler) {
 const isMain = Boolean(process.argv[1]) && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
 
 if (isMain) {
-  const mcp = process.argv.includes("--mcp") || process.env.CHROMEGATE_MCP === "1";
+  const mcp = process.argv.includes("--mcp") || process.env.CHROMEGATE_GW_MCP === "1";
   process.stdin.resume();
   if (mcp) {
     let resolved;
     try {
       resolved = resolveMcpToken();
     } catch (err) {
-      process.stderr.write(`[chromegate] 读取 token 失败：${err.message || err}\n`);
+      process.stderr.write(`[chromegate-gw] 读取 token 失败：${err.message || err}\n`);
       process.exit(1);
     }
     if (!resolved.token) {
-      process.stderr.write("[chromegate] 缺少 token。传入 --token-file 或 CHROMEGATE_TOKEN。\n");
+      process.stderr.write("[chromegate-gw] 缺少 token。传入 --token-file 或 CHROMEGATE_GW_TOKEN。\n");
       process.exit(1);
     }
     const nameIndex = process.argv.indexOf("--agent-name");

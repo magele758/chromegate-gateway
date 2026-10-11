@@ -5,7 +5,7 @@
  */
 
 export const CONFIRMATION_REQUIRED = "CONFIRMATION_REQUIRED";
-export const APPROVAL_STORAGE_KEY = "agentApprovalQueue";
+export const APPROVAL_STORAGE_KEY = "cgw.agentApprovalQueue";
 const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_MAX = 50;
 

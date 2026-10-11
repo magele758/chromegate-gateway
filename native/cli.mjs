@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * chromegate verify scenario.json
- * chromegate inbox enqueue|status
- * chromegate mcp-config
+ * chromegate-gateway verify scenario.json
+ * chromegate-gateway inbox enqueue|status
+ * chromegate-gateway mcp-config
  *
  * 只打印 MCP 配置，不写 Cursor / Claude / Codex 的配置文件，也不登记 Native Host。
  */
@@ -25,7 +25,7 @@ function take(argv, flag) {
 }
 
 function readToken(file) {
-  if (!file) return String(process.env.CHROMEGATE_TOKEN || "").trim();
+  if (!file) return String(process.env.CHROMEGATE_GW_TOKEN || "").trim();
   const expanded = file.startsWith("~") ? path.join(osHome(), file.slice(1)) : file;
   return fs.readFileSync(expanded, "utf8").trim();
 }
@@ -34,18 +34,18 @@ function osHome() {
   return process.env.HOME || process.env.USERPROFILE || "";
 }
 
-export function mcpSnippet({ hostPath = path.join(HERE, "host.mjs"), tokenFile = "~/.chromegate/agents/agent.token", nodePath = process.execPath } = {}) {
+export function mcpSnippet({ hostPath = path.join(HERE, "host.mjs"), tokenFile = "~/.chromegate-gw/agents/agent.token", nodePath = process.execPath } = {}) {
   return {
     cursor: {
       mcpServers: {
-        chromegate: {
+        "chromegate-gateway": {
           command: nodePath,
           args: [hostPath, "--mcp", "--token-file", tokenFile],
         },
       },
     },
-    claude: `claude mcp add --scope user chromegate -- ${nodePath} ${hostPath} --mcp --token-file ${tokenFile}`,
-    codex: `[mcp_servers.chromegate]\ncommand = ${JSON.stringify(nodePath)}\nargs = ${JSON.stringify([hostPath, "--mcp", "--token-file", tokenFile])}`,
+    claude: `claude mcp add --scope user chromegate-gateway -- ${nodePath} ${hostPath} --mcp --token-file ${tokenFile}`,
+    codex: `[mcp_servers.chromegate-gateway]\ncommand = ${JSON.stringify(nodePath)}\nargs = ${JSON.stringify([hostPath, "--mcp", "--token-file", tokenFile])}`,
   };
 }
 
@@ -62,15 +62,15 @@ async function verifyCommand(argv) {
     vars[pair.slice(0, eq)] = pair.slice(eq + 1);
   }
   const file = rest.find((arg) => !arg.startsWith("--"));
-  if (!file) throw new Error("用法：chromegate verify scenario.json [--dry-run] [--token-file f] [--outbox dir] [--var key=value]");
+  if (!file) throw new Error("用法：chromegate-gateway verify scenario.json [--dry-run] [--token-file f] [--outbox dir] [--var key=value]");
   const scenario = loadScenario(path.resolve(file));
   if (dryRun) {
     console.log(JSON.stringify(dryRunScenario(scenario), null, 2));
     return;
   }
   const token = readToken(tokenFile);
-  if (!token) throw new Error("verify 需要 --token-file 或 CHROMEGATE_TOKEN。");
-  const client = await connectGateway({ token, agentName: "chromegate-verify" });
+  if (!token) throw new Error("verify 需要 --token-file 或 CHROMEGATE_GW_TOKEN。");
+  const client = await connectGateway({ token, agentName: "chromegate-gw-verify" });
   try {
     const outcome = await runScenario(scenario, {
       call: (request) => client.call(request),
@@ -91,7 +91,7 @@ function inboxCommand(argv) {
     console.log(JSON.stringify(inboxStatus(root), null, 2));
     return;
   }
-  if (sub !== "enqueue") throw new Error("用法：chromegate inbox enqueue --tool name --token-file f [--arg key=value]");
+  if (sub !== "enqueue") throw new Error("用法：chromegate-gateway inbox enqueue --tool name --token-file f [--arg key=value]");
   const args = argv.slice(1);
   const tokenFile = take(args, "--token-file");
   const tool = take(args, "--tool");
@@ -120,7 +120,7 @@ export async function main(argv = process.argv.slice(2)) {
   if (command === "verify") return verifyCommand(rest);
   if (command === "inbox") return inboxCommand(rest);
   if (command === "mcp-config") return printMcp();
-  throw new Error("用法：chromegate verify|inbox|mcp-config");
+  throw new Error("用法：chromegate-gateway verify|inbox|mcp-config");
 }
 
 if (isMain) {

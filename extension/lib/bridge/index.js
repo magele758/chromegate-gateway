@@ -1,5 +1,5 @@
 /**
- * ChromeGate 控制入口。每次网关调用都校验 token、scope 和 origin。
+ * ChromeGate Gateway 控制入口。每次网关调用都校验 token、scope 和 origin。
  * 无 token 的调用一律拒绝。页面工具的返回值标为不可信，不会回写 token。
  */
 
@@ -135,7 +135,7 @@ export function createBridge(env = createDefaultEnv()) {
     if (!session) {
       return {
         protocol: BRIDGE_PROTOCOL,
-        name: "chromegate-bridge",
+        name: "chromegate-gw-bridge",
         extensionVersion: env.extensionVersion?.() ?? null,
         enabled: false,
         tools: [],
@@ -145,7 +145,7 @@ export function createBridge(env = createDefaultEnv()) {
     const auth = await authenticate(session);
     return {
       protocol: BRIDGE_PROTOCOL,
-      name: "chromegate-bridge",
+      name: "chromegate-gw-bridge",
       extensionVersion: env.extensionVersion?.() ?? null,
       enabled: true,
       agent: publicTokenInfo(auth.record, now()),
@@ -157,7 +157,7 @@ export function createBridge(env = createDefaultEnv()) {
 
   function originDenied(what, url, auth) {
     return new BridgeError(ERROR_CODES.ORIGIN_NOT_ALLOWED, `${what} 的 origin 不在 token「${auth.record.name}」的范围：${originOf(url)}`, {
-      hint: "在 ChromeGate 弹窗新建一个 origin 范围包含它的 token。",
+      hint: "在 ChromeGate Gateway 弹窗新建一个 origin 范围包含它的 token。",
       details: { origin: originOf(url), url },
     });
   }
@@ -332,7 +332,7 @@ export function createBridge(env = createDefaultEnv()) {
       return errorResponse(rawReq?.id, err);
     }
     if (!session?.token) {
-      return errorResponse(req.id, new BridgeError(ERROR_CODES.UNAUTHORIZED, "ChromeGate 只接受带 token 的调用。", { retryable: false }));
+      return errorResponse(req.id, new BridgeError(ERROR_CODES.UNAUTHORIZED, "ChromeGate Gateway 只接受带 token 的调用。", { retryable: false }));
     }
     let settings;
     try {

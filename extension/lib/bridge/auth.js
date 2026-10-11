@@ -87,7 +87,7 @@ export function normalizeTokenName(raw) {
     .slice(0, MAX_TOKEN_NAME);
 }
 
-/** 安装器用名字做文件名（~/.chromegate/agents/<name>.token）。 */
+/** 安装器用名字做文件名（~/.chromegate-gw/agents/<name>.token）。 */
 export function tokenFileName(name) {
   const slug = String(name || "")
     .toLowerCase()
@@ -168,7 +168,7 @@ export async function verifyToken(records, token, now = Date.now()) {
   const plain = String(token || "");
   if (!plain) {
     throw new BridgeError(ERROR_CODES.UNAUTHORIZED, "缺少 token。", {
-      hint: "在 ChromeGate 弹窗创建 token，并通过 CHROMEGATE_TOKEN 或 --token-file 传给 MCP host。",
+      hint: "在 ChromeGate Gateway 弹窗创建 token，并通过 CHROMEGATE_GW_TOKEN 或 --token-file 传给 MCP host。",
     });
   }
   if (!looksLikeToken(plain)) throw new BridgeError(ERROR_CODES.UNAUTHORIZED, "token 无效。");
@@ -188,7 +188,7 @@ export function scopeAllows(record, scope) {
 export function requireScope(record, scope, tool) {
   if (scopeAllows(record, scope)) return;
   throw new BridgeError(ERROR_CODES.SCOPE_DENIED, `token「${record?.name || "?"}」没有 ${scope || "(未声明)"} 权限，不能调用 ${tool}。`, {
-    hint: "在 ChromeGate 弹窗新建一个 scope 更大的 token。page:act 与 page:js 默认关闭。",
+    hint: "在 ChromeGate Gateway 弹窗新建一个 scope 更大的 token。page:act 与 page:js 默认关闭。",
     details: { scope: scope || null, tool },
   });
 }

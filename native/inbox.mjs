@@ -4,8 +4,8 @@ import path from "node:path";
 import crypto from "node:crypto";
 
 export function chromegateHome(env = process.env, home = os.homedir()) {
-  if (env.CHROMEGATE_HOME) return path.resolve(env.CHROMEGATE_HOME);
-  return path.join(home, ".chromegate");
+  if (env.CHROMEGATE_GW_HOME) return path.resolve(env.CHROMEGATE_GW_HOME);
+  return path.join(home, ".chromegate-gw");
 }
 
 export function inboxPaths(root) {

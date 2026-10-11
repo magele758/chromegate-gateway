@@ -1,7 +1,7 @@
-export const NATIVE_HOST_NAME = "com.chromegate.host";
+export const NATIVE_HOST_NAME = "com.chromegate.gateway";
 
 export function installHint() {
-  return "Native Host 需要你本人登记。见 README 的安装一节，ChromeGate 不会自行写入系统目录。";
+  return "Native Host 需要你本人登记。见 README 的安装一节，ChromeGate Gateway 不会自行写入系统目录。";
 }
 
 export function describeNativeError(err) {

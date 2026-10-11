@@ -155,7 +155,7 @@ function slug(name) {
 export function renderEvidence({ scenario, failure, evidence, calls }) {
   const verdict = failure?.verdict || {};
   const lines = [
-    `# ChromeGate verify 失败：${scenario?.name || "scenario"}`,
+    `# ChromeGate Gateway verify 失败：${scenario?.name || "scenario"}`,
     "",
     `- 时间：${new Date().toISOString()}`,
     `- 步骤：${failure?.step?.assert || failure?.step?.tool || "(未知)"}`,

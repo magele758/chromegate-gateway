@@ -297,7 +297,7 @@ const pick = (obj, keys) => Object.fromEntries(keys.filter((k) => obj?.[k] !== u
  * 把 chrome.* 事件接到总线。api 缺哪个就跳过哪个（测试里传假对象）。
  * JS 对话框来自 chrome.debugger 的 Page.javascriptDialogOpening：只在已附加调试器的标签上可见。
  */
-export function installEventSources(bus, api = globalThis.chrome, { onAgentTaskEvent = null, approvalKey = "agentApprovalQueue" } = {}) {
+export function installEventSources(bus, api = globalThis.chrome, { onAgentTaskEvent = null, approvalKey = "cgw.agentApprovalQueue" } = {}) {
   const tabs = api?.tabs;
   const downloadUrls = new Map();
   tabs?.onCreated?.addListener?.((tab) => {

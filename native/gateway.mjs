@@ -1,7 +1,7 @@
 /**
- * ChromeGate 外部 Agent 网关（本机部分）。
+ * ChromeGate Gateway 外部 Agent 网关（本机部分）。
  *
- *   Agent / MCP host ──NDJSON──▶ ~/.chromegate/bridge.sock（0600；Windows 命名管道）
+ *   Agent / MCP host ──NDJSON──▶ ~/.chromegate-gw/bridge.sock（0600；Windows 命名管道）
  *                                   │  broker（Chrome 用 connectNative 拉起的 chromegate host）
  *                                   ▼
  *                          Native Messaging port ──▶ 扩展 SW：bridge.call(request, { session })
@@ -28,12 +28,12 @@ export const MAX_FRAME_BYTES = 8 * 1024 * 1024;
 const MAX_AGENT_NAME = 80;
 
 export function defaultSocketPath({ env = process.env, platform = process.platform, home = os.homedir(), user } = {}) {
-  if (env.CHROMEGATE_SOCKET) return env.CHROMEGATE_SOCKET;
+  if (env.CHROMEGATE_GW_SOCKET) return env.CHROMEGATE_GW_SOCKET;
   if (platform === "win32") {
     const name = String(user || os.userInfo().username || "user").replace(/[^A-Za-z0-9_.-]/g, "_");
-    return `\\\\.\\pipe\\chromegate-bridge-${name}`;
+    return `\\\\.\\pipe\\chromegate-gw-bridge-${name}`;
   }
-  return path.join(home, ".chromegate", "bridge.sock");
+  return path.join(home, ".chromegate-gw", "bridge.sock");
 }
 
 const isPipe = (p) => String(p).startsWith("\\\\.\\pipe\\");
@@ -193,7 +193,7 @@ export function createBroker({ socketPath = defaultSocketPath(), post, log = () 
         fs.mkdirSync(path.dirname(socketPath), { recursive: true, mode: 0o700 });
         if (fs.existsSync(socketPath)) {
           if (await probeSocket(socketPath)) {
-            throw new Error(`已有 ChromeGate 网关在 ${socketPath} 上运行（另一个 Chrome / profile 已启用网关？）`);
+            throw new Error(`已有 ChromeGate Gateway 网关在 ${socketPath} 上运行（另一个 Chrome / profile 已启用网关？）`);
           }
           fs.unlinkSync(socketPath);
         }
@@ -279,7 +279,7 @@ export function createBroker({ socketPath = defaultSocketPath(), post, log = () 
 export class GatewayUnavailableError extends Error {
   constructor(socketPath, cause) {
     super(
-      `ChromeGate 网关未运行（${socketPath}）。请确认：Chrome 已打开；ChromeGate 弹窗已启用网关且至少有一个有效 token；` +
+      `ChromeGate Gateway 网关未运行（${socketPath}）。请确认：Chrome 已打开；ChromeGate Gateway 弹窗已启用网关且至少有一个有效 token；` +
         `Native Host 已由你本人登记。${cause ? `（${cause}）` : ""}`,
     );
     this.name = "GatewayUnavailableError";

@@ -8,8 +8,8 @@ import { hasActiveToken } from "./auth.js";
 import { TOKENS_KEY, loadAgentTokens } from "./token-store.js";
 import { getAuditLog } from "./audit.js";
 
-export const GATEWAY_ALARM = "chromegate-agent-gateway";
-export const GATEWAY_STATUS_KEY = "agentGatewayStatus";
+export const GATEWAY_ALARM = "chromegate-gw-agent-gateway";
+export const GATEWAY_STATUS_KEY = "cgw.agentGatewayStatus";
 
 export function shouldRunGateway(settings, tokens, now = Date.now()) {
   return settings?.agentGatewayEnabled === true && hasActiveToken(tokens, now);

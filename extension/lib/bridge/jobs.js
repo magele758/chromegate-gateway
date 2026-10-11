@@ -4,7 +4,7 @@
  * 持久化副本里大的 artifact 只留元数据（storage.session 总配额 10 MB）。
  */
 
-export const JOBS_KEY = "agentBridgeJobs";
+export const JOBS_KEY = "cgw.agentBridgeJobs";
 export const JOB_MAX = 50;
 export const PERSIST_ARTIFACT_MAX = 256 * 1024;
 

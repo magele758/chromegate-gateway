@@ -1,10 +1,10 @@
-# ChromeGate 拆分报告
+# ChromeGate Gateway 拆分报告
 
 日期：2026-10-11  
 新目录：`/Users/example/developer/self-test-grounding/chromegate`（开始时不存在，本次新建）  
 来源：open-chrome-ai / PageLens v0.12.1（Apache-2.0，copyright 2026 lei peng）  
 老仓库：`/Users/example/developer/self-test-grounding/chrome-plugin-gemini` 只读。开始和结束时 `git status --short` 都只有 `?? yarn.lock`。没有切分支、没有提交、没有推送、没有 PR。  
-运行时目录：`~/.chromegate/`。没有读写 `~/.pagelens/`，没有向 Chrome 注册 Native Messaging host，没有改 Cursor / Claude / Codex 的 MCP 配置，没有在真实 Chrome 里加载扩展，没有上传商店。  
+运行时目录：`~/.chromegate-gw/`。没有读写 `~/.pagelens/`，没有向 Chrome 注册 Native Messaging host，没有改 Cursor / Claude / Codex 的 MCP 配置，没有在真实 Chrome 里加载扩展，没有上传商店。  
 本地 git：只在新目录 `git init` 并提交。没有 remote，没有 push。  
 首次提交（代码与本报告初稿）：`ab4c96158738bfa467bdbdfc96c2ce9bed9ba190`  
 补记提交只把上一行的占位换成这个 hash，见 `git log`。没有 remote。
@@ -26,12 +26,12 @@
 
 - `extension/lib/bridge/policy.js`：默认 origin 只留 `http://localhost:*` 和 `http://127.0.0.1:*`。去掉微信、知乎、B 站、小红书、抖音。
 - `extension/lib/bridge/auth.js`：前缀 `cgk_`。scope 只留五个页面/标签项。未传 scopes 时默认 `tabs:read` + `page:read`。
-- `extension/lib/bridge/audit.js`：注释改为 chromegate-data。
+- `extension/lib/bridge/audit.js`：注释改为 chromegate-gw-data。
 - `extension/lib/bridge/leases.js`：租约范围是 `page:act`、`page:js`、`tabs:manage`。剪贴板工具列表为空。只有 `navigate` 且 `result.created` 才记新标签。
 - `extension/lib/bridge/events.js`：`agent_task.*` 不再要求 `agent:delegate`。下载事件仍要求 `downloads`，但没有 token 持有这个 scope，所以会被丢掉。
-- `extension/lib/idb-kv.js`：IndexedDB 名 `chromegate-data`。
+- `extension/lib/idb-kv.js`：IndexedDB 名 `chromegate-gw-data`。
 - `extension/lib/bridge/session-tools.js`：文案改为 navigate。
-- `native/gateway.mjs`：socket 改为 `~/.chromegate/bridge.sock`（可用 `CHROMEGATE_SOCKET`）。增加 `localCall()`，给 inbox 用，不另开 socket 客户端。
+- `native/gateway.mjs`：socket 改为 `~/.chromegate-gw/bridge.sock`（可用 `CHROMEGATE_GW_SOCKET`）。增加 `localCall()`，给 inbox 用，不另开 socket 客户端。
 
 新写（不是整文件搬过来）：
 
@@ -60,7 +60,7 @@
 - 无 token 的旧入口。`agentBridgeEnabled` 被强制为 false。没有 session token 的 hello 不暴露工具，call 返回 `UNAUTHORIZED`。
 - MCP `tools/list` 只返回扩展按 scope 过滤后的工具，并隐藏 `list_tools`。不再附加本机 shell/fs 工具。`--mcp` 缺少 token 时进程退出 1，不退回 shell。
 - host 拒绝 `exec`、`fs`、`shell`、`clipboard_write`。不 `import child_process`。
-- inbox 只在 `~/.chromegate/inbox|outbox` 搬 JSON。拒绝符号链接。outbox 不回写 token。
+- inbox 只在 `~/.chromegate-gw/inbox|outbox` 搬 JSON。拒绝符号链接。outbox 不回写 token。
 
 ## tts 依赖怎么解的
 
@@ -82,7 +82,7 @@ import { captureVoiceRefFromTab, synthesizeTts } from "../tts.js";
 | 必需 | `tabs` | `list_tabs`、`navigate` |
 | 必需 | `scripting` | 注入扩展自带的固定函数（读 DOM、点击、输入） |
 | 必需 | `debugger` | 截图、控制台、网络 / SSE、`run_js` 的 `Runtime.evaluate` |
-| 必需 | `nativeMessaging` | 连接 `com.chromegate.host` |
+| 必需 | `nativeMessaging` | 连接 `com.chromegate.gateway` |
 | 必需 | `alarms` | Service Worker 回收后重连网关 |
 | host | `http://*/*`、`https://*/*` | 普通网页和 localhost。不含 `file://`、`chrome://` |
 | 可选 | `userScripts` | 仅当 CSP 挡住 `Runtime.evaluate` 时的 `run_js` 回退 |
@@ -131,7 +131,7 @@ HITL：可见文案像发布 / 发送 / 提交 / 删除，或导航到结账 URL
 ```
 
 `test_auth_scope`、`test_bridge`、`test_gateway`、`test_hygiene`、`test_inbox`、`test_page_actions`、`test_verify`。  
-socket 和 inbox 都用临时目录。`defaultSocketPath` 的测试传入假 home，不创建 `~/.chromegate`。
+socket 和 inbox 都用临时目录。`defaultSocketPath` 的测试传入假 home，不创建 `~/.chromegate-gw`。
 
 ## grep 证据
 
@@ -170,13 +170,13 @@ rg -n -i --glob '!node_modules/**' --glob '!.git/**' \
 
 1. `chrome://extensions` 打开开发者模式，加载已解压的扩展，目录选 `chromegate/extension`。抄下扩展 ID。
 2. 确认 `native/host.mjs` 可执行（仓库已带 shebang）。你自己写  
-   `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.chromegate.host.json`  
-   `name` 为 `com.chromegate.host`，`path` 指向 `native/host.mjs` 的绝对路径，`type` 为 `stdio`，`allowed_origins` 为 `chrome-extension://扩展ID/`。然后重新加载扩展。
-3. 打开弹窗，打开网关。新建只读 token（不要勾 `page:act` / `page:js`）。明文只显示一次，自己存到 `~/.chromegate/agents/<名字>.token`，权限 `0600`。
+   `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.chromegate.gateway.json`  
+   `name` 为 `com.chromegate.gateway`，`path` 指向 `native/host.mjs` 的绝对路径，`type` 为 `stdio`，`allowed_origins` 为 `chrome-extension://扩展ID/`。然后重新加载扩展。
+3. 打开弹窗，打开网关。新建只读 token（不要勾 `page:act` / `page:js`）。明文只显示一次，自己存到 `~/.chromegate-gw/agents/<名字>.token`，权限 `0600`。
 4. `node native/cli.mjs mcp-config` 只打印。把片段自己贴进 Cursor / Claude Code / Codex。
 5. 用只读 token 调 `list_tabs`。再用它调 `click`，应被 scope 拒绝，页面不应被点到。
 6. 另建一个显式打开 `page:act` 的 token，origin 只填你控制的站。对删除类按钮点击应得到 `CONFIRMATION_REQUIRED`，在弹窗里允许一次后才能执行；再点一次应重新要求确认。
-7. `node native/cli.mjs verify scenarios/identity.json --dry-run`，然后带 `--token-file` 和 `--var base=...` 对你自己的本地页跑。`dialog-state.json` 需要 `page:act`。故意让断言失败时，应在 `~/.chromegate/outbox` 看到 markdown（和可能的 jpeg），并且后面的步骤不再执行。
-8. 确认运行时文件在 `~/.chromegate/`，`~/.pagelens/` 没有被这次使用碰到。
-9. 可选：弹窗打开 inbox 后，`node native/cli.mjs inbox enqueue` 只写 `~/.chromegate/`。网关连着时 host 才转发。
+7. `node native/cli.mjs verify scenarios/identity.json --dry-run`，然后带 `--token-file` 和 `--var base=...` 对你自己的本地页跑。`dialog-state.json` 需要 `page:act`。故意让断言失败时，应在 `~/.chromegate-gw/outbox` 看到 markdown（和可能的 jpeg），并且后面的步骤不再执行。
+8. 确认运行时文件在 `~/.chromegate-gw/`，`~/.pagelens/` 没有被这次使用碰到。
+9. 可选：弹窗打开 inbox 后，`node native/cli.mjs inbox enqueue` 只写 `~/.chromegate-gw/`。网关连着时 host 才转发。
 10. `userScripts` 是可选权限，只给 CSP 回退。不授予它时，debugger 路径仍可用于没有拦住 `Runtime.evaluate` 的页面。被观察的标签上会出现 Chrome 调试提示条。
