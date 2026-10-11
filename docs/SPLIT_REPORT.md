@@ -6,7 +6,7 @@
 老仓库：`/Users/example/developer/self-test-grounding/chrome-plugin-gemini` 只读。开始和结束时 `git status --short` 都只有 `?? yarn.lock`。没有切分支、没有提交、没有推送、没有 PR。  
 运行时目录：`~/.chromegate-gw/`。没有读写 `~/.pagelens/`，没有向 Chrome 注册 Native Messaging host，没有改 Cursor / Claude / Codex 的 MCP 配置，没有在真实 Chrome 里加载扩展，没有上传商店。  
 本地 git：只在新目录 `git init` 并提交。没有 remote，没有 push。  
-首次提交（代码与本报告初稿）：`ab4c96158738bfa467bdbdfc96c2ce9bed9ba190`  
+首次提交（代码与本报告初稿）：`1533ed7cbcedb98226339d314d79a27cfbab095c`  
 补记提交只把上一行的占位换成这个 hash，见 `git log`。没有 remote。
 
 ## 复制了什么
