@@ -1,0 +1,13 @@
+{
+  "name": "dialog-state",
+  "description": "A dialog opens after the first click and is gone after cancel. Requires a token with page:act.",
+  "vars": { "base": "http://127.0.0.1:4173" },
+  "steps": [
+    { "tool": "navigate", "args": { "url": "{{base}}/compose" } },
+    { "tool": "click", "args": { "selector": "#open-dialog" } },
+    { "assert": "dialog_state", "selector": "[role=dialog]", "open": true, "textIncludes": "确认" },
+    { "tool": "click", "args": { "selector": "[data-action=cancel]" } },
+    { "assert": "dialog_state", "selector": "[role=dialog]", "open": false },
+    { "assert": "network_count", "urlIncludes": "/api/draft", "count": 1 }
+  ]
+}

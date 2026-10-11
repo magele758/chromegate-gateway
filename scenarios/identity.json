@@ -1,0 +1,12 @@
+{
+  "name": "identity-consistency",
+  "description": "Two pages in the same signed-in browser must expose the same user id.",
+  "vars": { "base": "http://127.0.0.1:4173" },
+  "steps": [
+    { "tool": "navigate", "args": { "url": "{{base}}/profile" } },
+    { "tool": "query_dom", "args": { "selector": "[data-testid=user-id]" }, "save": "profile" },
+    { "tool": "navigate", "args": { "url": "{{base}}/settings" } },
+    { "tool": "query_dom", "args": { "selector": "[data-testid=user-id]" }, "save": "settings" },
+    { "assert": "identity", "left": "profile", "right": "settings", "path": "nodes.0.attrs.data-user-id" }
+  ]
+}

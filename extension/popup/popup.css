@@ -1,0 +1,28 @@
+:root {
+  color-scheme: light dark;
+  font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
+}
+body {
+  width: 360px;
+  margin: 0;
+  padding: 12px 14px 16px;
+}
+h1, h2 { margin: 0 0 8px; font-size: 14px; }
+h1 { font-size: 16px; }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+#gw-status { margin: 0; color: #666; }
+section { margin-top: 14px; }
+input, textarea, button {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+}
+.scopes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; margin-top: 6px; }
+.scopes label, .check, .hours { display: flex; gap: 6px; align-items: center; }
+.hours input { width: 80px; margin: 0; }
+.check { margin-top: 6px; }
+ul { list-style: none; padding: 0; margin: 0; }
+li { padding: 6px 0; border-top: 1px solid #ddd; }
+li button { width: auto; margin-left: 6px; }
+pre { white-space: pre-wrap; word-break: break-all; background: #f4f4f4; padding: 8px; }
+button { cursor: pointer; }

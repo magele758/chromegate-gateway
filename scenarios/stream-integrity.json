@@ -1,0 +1,15 @@
+{
+  "name": "stream-integrity",
+  "description": "DOM message sequence and SSE sequence must be equal and contiguous.",
+  "vars": { "base": "http://127.0.0.1:4173" },
+  "steps": [
+    { "tool": "navigate", "args": { "url": "{{base}}/chat" } },
+    {
+      "assert": "stream_integrity",
+      "selector": "[data-seq]",
+      "attr": "data-seq",
+      "sseUrlIncludes": "/stream"
+    },
+    { "assert": "no_console_errors" }
+  ]
+}

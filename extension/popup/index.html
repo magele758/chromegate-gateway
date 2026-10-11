@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>ChromeGate</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>ChromeGate</h1>
+      <p id="gw-status">网关未连接</p>
+    </header>
+    <label class="check"><input id="gw-enabled" type="checkbox" /> 启用本机网关</label>
+    <label class="check"><input id="inbox-enabled" type="checkbox" /> 启用 inbox 文件桥（~/.chromegate）</label>
+    <section>
+      <h2>新建 token</h2>
+      <input id="tok-name" placeholder="名称，例如 cursor" />
+      <div class="scopes" id="scopes">
+        <label><input type="checkbox" value="tabs:read" checked /> tabs:read</label>
+        <label><input type="checkbox" value="page:read" checked /> page:read</label>
+        <label><input type="checkbox" value="tabs:manage" /> tabs:manage</label>
+        <label><input type="checkbox" value="page:act" /> page:act</label>
+        <label><input type="checkbox" value="page:js" /> page:js</label>
+      </div>
+      <textarea id="tok-origins" rows="3">http://127.0.0.1:*
+http://localhost:*</textarea>
+      <label class="hours">过期（小时，可空）<input id="tok-hours" type="number" min="1" step="1" /></label>
+      <button id="tok-create" type="button">创建</button>
+      <pre id="tok-once" hidden></pre>
+    </section>
+    <section>
+      <h2>Token</h2>
+      <ul id="tok-list"></ul>
+    </section>
+    <section>
+      <h2>待确认</h2>
+      <ul id="approvals"></ul>
+    </section>
+    <section>
+      <h2>审计</h2>
+      <ul id="audit"></ul>
+    </section>
+    <button id="allow-userscripts" type="button">允许用户脚本（run_js 的 CSP 后备）</button>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
